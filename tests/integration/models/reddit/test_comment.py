@@ -44,6 +44,13 @@ class TestComment(IntegrationTest):
             assert comment.author is None
             assert comment.body == '[deleted]'
 
+    def test_disable_inbox_replies(self):
+        self.reddit.read_only = False
+        comment = Comment(self.reddit, 'dcc9snh')
+        with self.recorder.use_cassette(
+                'TestComment.test_disable_inbox_replies'):
+            comment.disable_inbox_replies()
+
     def test_downvote(self):
         self.reddit.read_only = False
         with self.recorder.use_cassette('TestComment.test_downvote'):
@@ -57,6 +64,13 @@ class TestComment(IntegrationTest):
             comment = Comment(self.reddit, 'd1616q2')
             comment.edit('New text')
             assert comment.body == 'New text'
+
+    def test_enable_inbox_replies(self):
+        self.reddit.read_only = False
+        comment = Comment(self.reddit, 'dcc9snh')
+        with self.recorder.use_cassette(
+                'TestComment.test_enable_inbox_replies'):
+            comment.enable_inbox_replies()
 
     def test_gild__no_creddits(self):
         self.reddit.read_only = False
@@ -104,6 +118,15 @@ class TestComment(IntegrationTest):
             comment = submission.comments[0].replies[0]
         parent = comment.parent()
         assert comment in parent.replies
+        assert isinstance(parent, Comment)
+        assert parent.fullname == comment.parent_id
+
+    @mock.patch('time.sleep', return_value=None)
+    def test_parent__from_replies(self, _):
+        self.reddit.read_only = False
+        with self.recorder.use_cassette('TestComment.parent__from_replies'):
+            comment = next(self.reddit.inbox.comment_replies())
+        parent = comment.parent()
         assert isinstance(parent, Comment)
         assert parent.fullname == comment.parent_id
 

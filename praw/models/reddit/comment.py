@@ -20,14 +20,14 @@ class Comment(RedditBase, InboxableMixin, UserContentMixin):
 
     @property
     def mod(self):
-        """An instance of :class:`.CommentModeration`."""
+        """Provide an instance of :class:`.CommentModeration`."""
         if self._mod is None:
             self._mod = CommentModeration(self)
         return self._mod
 
     @property
     def replies(self):
-        """An instance of :class:`.CommentForest`."""
+        """Provide an instance of :class:`.CommentForest`."""
         if isinstance(self._replies, list):
             self._replies = CommentForest(self.submission, self._replies)
         return self._replies
@@ -37,7 +37,7 @@ class Comment(RedditBase, InboxableMixin, UserContentMixin):
         """Return the Submission object this comment belongs to."""
         if not self._submission:  # Comment not from submission
             self._submission = self._reddit.submission(
-                self.link_id.split('_', 1)[1])
+                self._extract_submission_id())
         return self._submission
 
     @submission.setter
@@ -75,6 +75,12 @@ class Comment(RedditBase, InboxableMixin, UserContentMixin):
         elif attribute == 'subreddit':
             value = self._reddit.subreddit(value)
         super(Comment, self).__setattr__(attribute, value)
+
+    def _extract_submission_id(self):
+        if 'context' in self.__dict__:
+            return self.context.rsplit('/', 4)[1]
+        else:
+            return self.link_id.split('_', 1)[1]
 
     def parent(self):
         """Return the parent of the comment.
@@ -153,10 +159,13 @@ class Comment(RedditBase, InboxableMixin, UserContentMixin):
         if not comment_list:
             raise ClientException('Comment has been deleted')
         comment = comment_list[0]
+
+        if self._submission is not None:
+            del comment.__dict__['_submission']  # Don't replace if set
+        self.__dict__.update(comment.__dict__)
+
         for reply in comment._replies:
             reply.submission = self.submission
-        del comment.__dict__['_submission']  # Don't replace
-        self.__dict__.update(comment.__dict__)
         return self
 
 

@@ -1,6 +1,7 @@
 """Test praw.reddit."""
 from praw.models import LiveThread
 from praw.models.reddit.base import RedditBase
+from praw.models.reddit.submission import Submission
 import mock
 
 from . import IntegrationTest
@@ -20,6 +21,13 @@ class TestReddit(IntegrationTest):
         assert len(results) > 100
         for item in results:
             assert isinstance(item, RedditBase)
+
+    def test_info_url(self):
+        with self.recorder.use_cassette('TestReddit.test_info_url'):
+            results = self.reddit.info(url='youtube.com')
+        assert len(results) > 0
+        for item in results:
+            assert isinstance(item, Submission)
 
     @mock.patch('time.sleep', return_value=None)
     def test_live_call(self, _):
@@ -84,6 +92,13 @@ class TestReddit(IntegrationTest):
         thread_ids = [thread.id for thread in threads]
         assert thread_ids != ids
         assert sorted(thread_ids) == ids
+
+    def test_live_now__featured(self):
+        with self.recorder.use_cassette('TestReddit.test_live_now'
+                                        '__featured'):
+            thread = self.reddit.live.now()
+        assert isinstance(thread, LiveThread)
+        assert thread.id == 'z2f981agq7ky'
 
     def test_live_now__no_featured(self):
         with self.recorder.use_cassette('TestReddit.test_live_now'

@@ -1,13 +1,69 @@
 Change Log
 ==========
 
-Unreleased
-----------
+Unreleased PRAW5
+----------------
 
 **Added**
 
-* :meth:`~praw.models.reddit.subreddit.Modmail.bulk_read` to get unread count
-  by conversation state.
+* :meth:`.Comment.disable_inbox_replies`, :meth:`.Comment.enable_inbox_replies`
+  :meth:`.Submission.disable_inbox_replies`, and
+  :meth:`.Submission.enable_inbox_replies` to toggle inbox replies on comments
+  and submissions.
+* :attr:`.SubredditFlair.link_templates` to manage link flair templates.
+
+**Changed**
+
+* ``cloudsearch`` is no longer the default syntax for
+  :meth:`.Subreddit.search`. ``lucene`` is now the default
+  syntax so that PRAW's default is aligned with Reddit's default.
+* :meth:`.Reddit.info` will now take either a list of fullnames 
+  or a single URL string.
+* :meth:`.Subreddit.submit` accepts a flair template ID and text.
+
+**Fixed**
+
+* Fix accessing :attr:`.LiveUpdate.contrib` raises ``AttributeError``.
+
+**Removed**
+
+* Iterating directly over :class:`.SubredditRelationship` (e.g.,
+  ``subreddit.banned``, ``subreddit.contributor``, ``subreddit.moderator``,
+  etc) and :class:`.SubredditFlair` is no longer possible. Iterate instead over
+  their callables, e.g. ``subreddit.banned()`` and ``subreddit.flair()``.
+* The following methods are removed:
+  ``Subreddit.mod.approve``, ``Subreddit.mod.distinguish``,
+  ``Subreddit.mod.ignore_reports``, ``Subreddit.mod.remove``,
+  ``Subreddit.mod.undistinguish``, ``Subreddit.mod.unignore_reports``.
+* Support for passing a :class:`.Submission` to :meth:`.SubredditFlair.set`
+  is removed.
+* The ``thing`` argument to :meth:`.SubredditFlair.set` is removed.
+* Return values from :meth:`.Comment.block`, :meth:`.Message.block`,
+  :meth:`.SubredditMessage.block`, :meth:`.SubredditFlair.delete`,
+  :meth:`.friend`, :meth:`.Redditor.message`, :meth:`.Subreddit.message`,
+  :meth:`.select`, and :meth:`.unfriend` are removed as they do not provide
+  any useful information.
+* ``praw.ini`` no longer reads in ``http_proxy`` and ``https_proxy`` settings.
+* ``is_link`` parameter of :meth:`.SubredditRedditorFlairTemplates.add` and
+  :meth:`.SubredditRedditorFlairTemplates.clear`. Use
+  :class:`.SubredditLinkFlairTemplates` instead.
+
+4.5.1 (2017/05/07)
+------------------
+
+**Fixed**
+
+* Calling :meth:`.parent` works on :class:`.Comment` instances obtained via
+  :meth:`.comment_replies`.
+
+
+4.5.0 (2017/04/29)
+------------------
+
+**Added**
+
+* :meth:`~praw.models.reddit.subreddit.Modmail.unread_count` to get unread
+  count by conversation state.
 * :meth:`~praw.models.reddit.subreddit.Modmail.bulk_read` to mark conversations
   as read by conversation state.
 * :meth:`~praw.models.reddit.subreddit.Modmail.subreddits` to fetch subreddits
@@ -45,17 +101,22 @@ Unreleased
 * :class:`.Reddit` accepts ``requestor_class=cls`` for a customized requestor
   class and ``requestor_kwargs={'param': value}`` for passing arguments to
   requestor initialization.
+* :meth:`~praw.models.reddit.subreddit.SubredditStream.comments`,
+  :meth:`~praw.models.reddit.subreddit.SubredditStream.submissions`, and
+  :meth:`~praw.models.Subreddits.stream` accept a ``pause_after`` argument to
+  allow pausing of the stream. The default value of ``None`` retains the
+  preexisting behavior.
 
 **Deprecated**
 
-* `cloudsearch` will no longer be the default syntax for
-  :meth:`.Subreddit.search` in PRAW 5. Instead `lucene` will be the default
+* ``cloudsearch`` will no longer be the default syntax for
+  :meth:`.Subreddit.search` in PRAW 5. Instead ``lucene`` will be the default
   syntax so that PRAW's default is aligned with Reddit's default.
 
 **Fixed**
 
 * Fix bug where :class:`.WikiPage` revisions with deleted authors caused
-  `TypeError`.
+  ``TypeError``.
 * :class:`.Submission` attributes ``comment_limit`` and ``comment_sort``
   maintain their values after making instances non-lazy.
 
@@ -244,7 +305,7 @@ Unreleased
 
 * Fix bug where ipython tries to access attribute
   ``_ipython_canary_method_should_not_exist_`` resulting in a useless fetch.
-* Fix bug where Comment replies becomes `[]` after attempting to access an
+* Fix bug where Comment replies becomes ``[]`` after attempting to access an
   invalid attribute on the Comment.
 * Reddit.wiki[...] converts the passed in page name to lower case as pages are
   only saved in lower case and non-lower case page names results in a Redirect
@@ -337,7 +398,7 @@ PRAW 4. If you require additional help please ask on `/r/redditdev
 
 * Removed :class:`.Reddit`'s ``login`` method. Authentication must be done
   through OAuth.
-* Removed `praw-multiprocess` as this functionality is no longer needed with
+* Removed ``praw-multiprocess`` as this functionality is no longer needed with
   PRAW 4.
 * Removed non-oauth functions ``Message.collapse`` and ``Message.uncollapse``
   ``is_username_available``.

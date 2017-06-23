@@ -2,7 +2,7 @@
 import sys
 
 
-__version__ = '4.4.1.dev0'
+__version__ = '5.0.0.dev0'
 
 API_PATH = {
     'about_edited':           'r/{subreddit}/about/edited/',
@@ -52,6 +52,7 @@ API_PATH = {
     'karma':                  'api/v1/me/karma',
     'leavecontributor':       'api/leavecontributor',
     'leavemoderator':         'api/leavemoderator',
+    'link_flair':             'r/{subreddit}/api/link_flair',
     'list_banned':            'r/{subreddit}/about/banned/',
     'list_contributor':       'r/{subreddit}/about/contributors/',
     'list_moderator':         'r/{subreddit}/about/moderators/',
@@ -119,6 +120,7 @@ API_PATH = {
     'save':                   'api/save/',
     'search':                 'r/{subreddit}/search/',
     'select_flair':           'r/{subreddit}/api/selectflair/',
+    'sendreplies':            'api/sendreplies',
     'sent':                   'message/sent/',
     'setpermissions':         'r/{subreddit}/api/setpermissions/',
     'spoiler':                'api/spoiler/',
